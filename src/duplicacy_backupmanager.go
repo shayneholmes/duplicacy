@@ -138,7 +138,9 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 		return false
 	}
 
-	override_time(timestamp)
+	if timestamp.Unix() > 0 {
+		override_time(timestamp)
+	}
 
 	startTime := time_now().Unix()
 
