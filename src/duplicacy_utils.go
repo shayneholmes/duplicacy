@@ -39,6 +39,18 @@ func init() {
 
 }
 
+var timeOffset time.Duration = 0
+
+func time_now() time.Time {
+	return time.Now().Add(timeOffset)
+}
+
+// A call to time_now at the moment this call is made will return the override
+// time. Time will progress normally from then.
+func override_time(t time.Time) {
+	timeOffset = t.Sub(time.Now())
+}
+
 func CreateRateLimitedReader(content []byte, rate int) *RateLimitedReader {
 	return &RateLimitedReader{
 		Content: content,
