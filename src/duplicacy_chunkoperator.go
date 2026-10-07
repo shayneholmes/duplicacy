@@ -77,7 +77,7 @@ func CreateChunkOperator(config *Config, storage Storage, snapshotCache *FileSto
 		stopChannel: make(chan bool),
 
 		collectionLock: &sync.Mutex{},
-		startTime: time.Now().Unix(),
+		startTime: time_now().Unix(),
 		allowFailures: allowFailures,
 		rewriteChunks: rewriteChunks,
 	}
@@ -493,7 +493,7 @@ func (operator *ChunkOperator) DownloadChunk(threadIndex int, task ChunkTask) {
 
 	if (operator.showStatistics || IsTracing()) && operator.totalChunkSize > 0 {
 
-		now := time.Now().Unix()
+		now := time_now().Unix()
 		if now <= operator.startTime {
 			now = operator.startTime + 1
 		}

@@ -13,7 +13,6 @@ import (
 	"path"
 	"strings"
 	"syscall"
-	"time"
 )
 
 // FileStorage is a local on-disk file storage implementing the Storage interface.
@@ -57,7 +56,7 @@ func CreateFileStorage(storageDir string, isCacheNeeded bool, threads int) (stor
 	}
 
 	// Random number fo generating the temporary chunk file suffix.
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time_now().UnixNano())
 
 	storage.DerivedStorage = storage
 	storage.SetDefaultNestingLevels([]int{2, 3}, 2)

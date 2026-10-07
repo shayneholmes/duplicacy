@@ -129,7 +129,7 @@ func (reader *RateLimitedReader) Read(p []byte) (n int, err error) {
 	}
 
 	if reader.StartTime.IsZero() {
-		reader.StartTime = time.Now()
+		reader.StartTime = time_now()
 	}
 
 	elapsed := time.Since(reader.StartTime).Seconds()

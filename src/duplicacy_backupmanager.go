@@ -19,7 +19,6 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
-	"time"
 
     "github.com/vmihailenco/msgpack"
 )
@@ -138,7 +137,7 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 		return false
 	}
 
-	startTime := time.Now().Unix()
+	startTime := time_now().Unix()
 
 	LOG_DEBUG("BACKUP_PARAMETERS", "top: %s, quick: %t, tag: %s", top, quickMode, tag)
 
@@ -390,8 +389,8 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 		}
 	}
 
-	startUploadingTime := time.Now().Unix()
-	lastUploadingTime := time.Now().Unix()
+	startUploadingTime := time_now().Unix()
+	lastUploadingTime := time_now().Unix()
 
 	var numberOfNewFileChunks int64        // number of new file chunks
 	var totalUploadedFileChunkLength int64 // total length of uploaded file chunks
@@ -419,7 +418,7 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 		uploadedModifiedFileSize := atomic.AddInt64(&uploadedModifiedFileSize, int64(chunkSize))
 
 		if (IsTracing() || showStatistics) && totalModifiedFileSize > 0 {
-			now := time.Now().Unix()
+			now := time_now().Unix()
 			if now <= startUploadingTime {
 				now = startUploadingTime + 1
 			}
@@ -448,7 +447,7 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 
 		_, found := chunkCache[chunkID]
 		if found {
-			if time.Now().Unix() - lastUploadingTime > keepUploadAlive {
+			if time_now().Unix() - lastUploadingTime > keepUploadAlive {
 				LOG_INFO("UPLOAD_KEEPALIVE", "Skip chunk cache to keep connection alive")
 				found = false
 			}
@@ -457,7 +456,7 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 		if found {
 			uploadChunkCompletionFunc(chunk, chunkIndex, true, chunkSize, 0)
 		} else {
-			lastUploadingTime = time.Now().Unix()
+			lastUploadingTime = time_now().Unix()
 			chunkCache[chunkID] = true
 
 			chunkOperator.Upload(chunk, chunkIndex, false)
@@ -491,7 +490,7 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 	fileChunkMaker.AddData(nil, uploadChunkFunc)
 	chunkOperator.WaitForCompletion()
 
-	localSnapshot.EndTime = time.Now().Unix()
+	localSnapshot.EndTime = time_now().Unix()
 
 	localSnapshot.Tag = tag
 	localSnapshot.Options = ""
@@ -579,7 +578,7 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 			PrettyNumber(totalUploadedFileChunkLength+totalUploadedMetadataChunkLength),
 			PrettyNumber(totalUploadedFileChunkBytes+totalUploadedMetadataChunkBytes))
 
-		now := time.Now().Unix()
+		now := time_now().Unix()
 		if now == startTime {
 			now = startTime + 1
 		}
@@ -630,7 +629,7 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 func (manager *BackupManager) Restore(top string, revision int, inPlace bool, quickMode bool, threads int, overwrite bool,
 	deleteMode bool, setOwner bool, showStatistics bool, patterns []string, allowFailures bool) int {
 
-	startTime := time.Now().Unix()
+	startTime := time_now().Unix()
 
 	LOG_DEBUG("RESTORE_PARAMETERS", "top: %s, revision: %d, in-place: %t, quick: %t, delete: %t",
 		top, revision, inPlace, quickMode, deleteMode)
@@ -828,7 +827,7 @@ func (manager *BackupManager) Restore(top string, revision int, inPlace bool, qu
 
 	chunkMaker := CreateFileChunkMaker(manager.config, true)
 
-	startDownloadingTime := time.Now().Unix()
+	startDownloadingTime := time_now().Unix()
 
 	// Now download files one by one
 	for _, file := range fileEntries {
@@ -934,7 +933,7 @@ func (manager *BackupManager) Restore(top string, revision int, inPlace bool, qu
 		LOG_INFO("RESTORE_STATS", "Skipped %d file, %s bytes", skippedFileCount, PrettySize(skippedFileSize))
 	}
 
-	runningTime := time.Now().Unix() - startTime
+	runningTime := time_now().Unix() - startTime
 	if runningTime == 0 {
 		runningTime = 1
 	}
@@ -1724,7 +1723,7 @@ func (manager *BackupManager) CopySnapshots(otherManager *BackupManager, snapsho
 	chunkDownloader := CreateChunkOperator(manager.config, manager.storage, nil, false, false, downloadingThreads, false)
 
 	var uploadedBytes int64
-	startTime := time.Now()
+	startTime := time_now()
 
 	copiedChunks := 0
 	chunkUploader := CreateChunkOperator(otherManager.config, otherManager.storage, nil, false, false, uploadingThreads, false)
@@ -1737,7 +1736,7 @@ func (manager *BackupManager) CopySnapshots(otherManager *BackupManager, snapsho
 
 		atomic.AddInt64(&uploadedBytes, int64(chunkSize))
 
-		elapsedTime := time.Now().Sub(startTime).Seconds()
+		elapsedTime := time_now().Sub(startTime).Seconds()
 		speed := int64(float64(atomic.LoadInt64(&uploadedBytes)) / elapsedTime)
 		remainingTime := int64(float64(len(chunksToCopy) - chunkIndex - 1) / float64(chunkIndex + 1) * elapsedTime)
 		percentage := float64(chunkIndex + 1) / float64(len(chunksToCopy)) * 100.0

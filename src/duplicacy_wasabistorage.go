@@ -112,7 +112,7 @@ func (storage *WasabiStorage) MoveFile(threadIndex int, from string, to string) 
 		toPath = fmt.Sprintf("%s/%s", storage.storageDir, to)
 	}
 
-	timestamp := time.Now().Format(time.RFC1123Z)
+	timestamp := time_now().Format(time.RFC1123Z)
 
 	signingString := fmt.Sprintf("MOVE\n\n\n%s\n%s", timestamp, fromPath)
 

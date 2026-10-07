@@ -22,7 +22,7 @@ func generateRandomString(length int) string {
     return string(b)
 }
 
-var fileSizeGenerator = rand.NewZipf(rand.New(rand.NewSource(time.Now().UnixNano())), 1.2, 1.0, 1024)
+var fileSizeGenerator = rand.NewZipf(rand.New(rand.NewSource(time_now().UnixNano())), 1.2, 1.0, 1024)
 
 func generateRandomFileSize() int64 {
 	return int64(fileSizeGenerator.Uint64() + 1)

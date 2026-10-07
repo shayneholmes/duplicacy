@@ -11,7 +11,6 @@ import (
 	"runtime/debug"
 	"sync"
 	"testing"
-	"time"
 	"regexp"
 )
 
@@ -141,7 +140,7 @@ func logf(level int, logID string, format string, v ...interface{}) {
 		return
 	}
 
-	now := time.Now()
+	now := time_now()
 
 	// Uncomment this line to enable unbufferred logging for tests
 	// fmt.Printf("%s %s %s %s\n", now.Format("2006-01-02 15:04:05.000"), getLevelName(level), logID, message)

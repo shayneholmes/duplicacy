@@ -13,7 +13,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 	"sort"
 
     "github.com/vmihailenco/msgpack"
@@ -54,7 +53,7 @@ func CreateEmptySnapshot(id string) (snapshto *Snapshot) {
 		Version:   1,
 		ID:        id,
 		Revision:  0,
-		StartTime: time.Now().Unix(),
+		StartTime: time_now().Unix(),
 	}
 }
 

@@ -116,7 +116,7 @@ func TestRateLimit(t *testing.T) {
 	expectedRate := 10
 	rateLimiter := CreateRateLimitedReader(content, expectedRate)
 
-	startTime := time.Now()
+	startTime := time_now()
 	n, err := io.Copy(ioutil.Discard, rateLimiter)
 	if err != nil {
 		t.Errorf("Error reading from the rate limited reader: %v", err)
@@ -131,7 +131,7 @@ func TestRateLimit(t *testing.T) {
 	actualRate := float64(len(content)) / elapsed.Seconds() / 1024
 	t.Logf("Elapsed time: %s, actual rate: %.3f kB/s, expected rate: %d kB/s", elapsed, actualRate, expectedRate)
 
-	startTime = time.Now()
+	startTime = time_now()
 	n, err = RateLimitedCopy(ioutil.Discard, bytes.NewBuffer(content), expectedRate)
 	if err != nil {
 		t.Errorf("Error writing with rate limit: %v", err)

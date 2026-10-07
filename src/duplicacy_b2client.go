@@ -303,7 +303,7 @@ func (client *B2Client) AuthorizeAccount(threadIndex int) (err error, allowed bo
 	defer client.Lock.Unlock()
 
 	// Don't authorize if the previous one was done less than 30 seconds ago
-	if client.LastAuthorizationTime != 0 && client.LastAuthorizationTime > time.Now().Unix() - 30 {
+	if client.LastAuthorizationTime != 0 && client.LastAuthorizationTime > time_now().Unix() - 30 {
 		return nil, false
 	}
 
@@ -332,7 +332,7 @@ func (client *B2Client) AuthorizeAccount(threadIndex int) (err error, allowed bo
 	LOG_INFO("BACKBLAZE_URL", "Download URL is: %s", client.DownloadURL)
 	client.IsAuthorized = true
 
-	client.LastAuthorizationTime = time.Now().Unix()
+	client.LastAuthorizationTime = time_now().Unix()
 
 	return nil, true
 }

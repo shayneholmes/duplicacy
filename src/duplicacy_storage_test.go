@@ -312,7 +312,7 @@ func moveChunk(t *testing.T, storage Storage, chunkID string, isFossil bool, del
 
 func TestStorage(t *testing.T) {
 
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time_now().UnixNano())
 	setTestingT(t)
 	SetLoggingLevel(INFO)
 

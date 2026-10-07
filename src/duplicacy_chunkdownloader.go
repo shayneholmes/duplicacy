@@ -6,7 +6,6 @@ package duplicacy
 
 import (
 	"sync/atomic"
-	"time"
 )
 
 // ChunkDownloadTask encapsulates information need to download a chunk.
@@ -57,7 +56,7 @@ func CreateChunkDownloader(operator *ChunkOperator) *ChunkDownloader {
 
 		completionChannel: make(chan ChunkDownloadCompletion),
 
-		startTime: time.Now().Unix(),
+		startTime: time_now().Unix(),
 	}
 
 	return downloader

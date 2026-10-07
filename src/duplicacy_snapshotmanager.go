@@ -148,7 +148,7 @@ func (collection *FossilCollection) IsDeletable(isStrongConsistent bool, ignored
 			// snapshot id during the last 7 days.  A snapshot created at the roughly same time as this fossil
 			// collection would have finsihed already, while a snapshot currently being created does not affect
 			// this fossil collection.
-			if lastSnapshotTime[hostID] > 0 && lastSnapshotTime[hostID] < time.Now().Unix()-maxSnapshotRunningTime*secondsInDay {
+			if lastSnapshotTime[hostID] > 0 && lastSnapshotTime[hostID] < time_now().Unix()-maxSnapshotRunningTime*secondsInDay {
 				LOG_INFO("SNAPSHOT_INACTIVE", "Ignore snapshot %s whose last revision was created more than %d days ago",
 					hostID, maxSnapshotRunningTime)
 				continue
@@ -174,8 +174,8 @@ func (collection *FossilCollection) IsEmpty() bool {
 
 // Calculates the number of days between two times ignoring the hours, minutes and seconds.
 func getDaysBetween(start int64, end int64) int {
-	startTime := time.Unix(start, 0).In(time.Now().Location())
-	endTime := time.Unix(end, 0).In(time.Now().Location())
+	startTime := time.Unix(start, 0).In(time_now().Location())
+	endTime := time.Unix(end, 0).In(time_now().Location())
 	startDate := time.Date(startTime.Year(), startTime.Month(), startTime.Day(), 0, 0, 0, 0, startTime.Location())
 	endDate := time.Date(endTime.Year(), endTime.Month(), endTime.Day(), 0, 0, 0, 0, endTime.Location())
 	hours := int(endDate.Sub(startDate).Hours())
@@ -1042,7 +1042,7 @@ func (manager *SnapshotManager) CheckSnapshots(snapshotID string, revisionsToChe
 
 	LOG_INFO("SNAPSHOT_VERIFY", "Verifying %d chunks", len(*allChunkHashes))
 
-	startTime := time.Now()
+	startTime := time_now()
 	var chunkHashes []string
 
 	skippedChunks := 0
@@ -1064,7 +1064,7 @@ func (manager *SnapshotManager) CheckSnapshots(snapshotID string, revisionsToChe
 	var totalDownloadedChunkSize int64
 	var totalDownloadedChunks int64
 	totalChunks := int64(len(chunkHashes))
-	lastSaveTime := time.Now().Unix()
+	lastSaveTime := time_now().Unix()
 
 	chunkChannel := make(chan int, threads)
 	var wg sync.WaitGroup
@@ -1089,7 +1089,7 @@ func (manager *SnapshotManager) CheckSnapshots(snapshotID string, revisionsToChe
 				if !chunk.isBroken {
 					chunkID := manager.config.GetChunkIDFromHash(chunkHashes[chunkIndex])
 					verifiedChunksLock.Lock()
-					now := time.Now().Unix()
+					now := time_now().Unix()
 					verifiedChunks[chunkID] = now
 					if now > lastSaveTime + 5 * 60 {
 						lastSaveTime = now
@@ -1102,7 +1102,7 @@ func (manager *SnapshotManager) CheckSnapshots(snapshotID string, revisionsToChe
 					downloadedChunkSize := atomic.AddInt64(&totalDownloadedChunkSize, int64(chunk.GetLength()))
 					downloadedChunks := atomic.AddInt64(&totalDownloadedChunks, 1)
 
-					elapsedTime := time.Now().Sub(startTime).Seconds()
+					elapsedTime := time_now().Sub(startTime).Seconds()
 					speed := int64(float64(downloadedChunkSize) / elapsedTime)
 					remainingTime := int64(float64(totalChunks - downloadedChunks) / float64(downloadedChunks) * elapsedTime)
 					percentage := float64(downloadedChunks) / float64(totalChunks) * 100.0
@@ -1873,7 +1873,7 @@ func (manager *SnapshotManager) PruneSnapshots(selfID string, snapshotID string,
 	if err != nil {
 		LOG_ERROR("LOG_DIR", "Could not open log directory %s: %v", logDir, err)
 	}
-	logFileName := path.Join(logDir, time.Now().Format("prune-log-20060102-150405"))
+	logFileName := path.Join(logDir, time_now().Format("prune-log-20060102-150405"))
 	logFile, err := os.OpenFile(logFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		LOG_ERROR("LOG_FILE", "Could not open log file %s: %v", logFileName, err)
@@ -2175,7 +2175,7 @@ func (manager *SnapshotManager) PruneSnapshots(selfID string, snapshotID string,
 			}
 
 			lastSnapshotTime := int64(0)
-			now := time.Now().Unix()
+			now := time_now().Unix()
 			i := 0
 			for j, snapshot := range snapshots {
 
@@ -2263,7 +2263,7 @@ func (manager *SnapshotManager) PruneSnapshots(selfID string, snapshotID string,
 
 	// Save the fossil collection if it is not empty.
 	if !collection.IsEmpty() && !dryRun && !exclusive {
-		collection.EndTime = time.Now().Unix()
+		collection.EndTime = time_now().Unix()
 
 		collectionNumber := maxCollectionNumber + 1
 		collectionFile := path.Join(collectionDir, fmt.Sprintf("%d", collectionNumber))

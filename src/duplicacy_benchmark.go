@@ -14,7 +14,6 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 func benchmarkSplit(reader *bytes.Reader, fileSize int64, chunkSize int, compression bool, encryption bool, annotation string) {
@@ -31,7 +30,7 @@ func benchmarkSplit(reader *bytes.Reader, fileSize int64, chunkSize int, compres
 
 	maker := CreateFileChunkMaker(config, false)
 
-	startTime := float64(time.Now().UnixNano()) / 1e9
+	startTime := float64(time_now().UnixNano()) / 1e9
 	numberOfChunks := 0
 	reader.Seek(0, os.SEEK_SET)
 
@@ -53,7 +52,7 @@ func benchmarkSplit(reader *bytes.Reader, fileSize int64, chunkSize int, compres
 	maker.AddData(reader, chunkFunc)
 	maker.AddData(nil, chunkFunc)
 
-	runningTime := float64(time.Now().UnixNano())/1e9 - startTime
+	runningTime := float64(time_now().UnixNano())/1e9 - startTime
 	speed := int64(float64(fileSize) / runningTime)
 	LOG_INFO("BENCHMARK_SPLIT", "Split %s bytes into %d chunks %s in %.2fs: %s/s", PrettySize(fileSize), numberOfChunks, annotation,
 		runningTime, PrettySize(speed))
@@ -111,7 +110,7 @@ func Benchmark(localDirectory string, storage Storage, fileSize int64, chunkSize
 		return false
 	}
 
-	startTime := float64(time.Now().UnixNano()) / 1e9
+	startTime := float64(time_now().UnixNano()) / 1e9
 	LOG_INFO("BENCHMARK_WRITE", "Writing random data to local disk")
 	err = ioutil.WriteFile(filename, data, 0600)
 	if err != nil {
@@ -119,11 +118,11 @@ func Benchmark(localDirectory string, storage Storage, fileSize int64, chunkSize
 		return false
 	}
 
-	runningTime := float64(time.Now().UnixNano())/1e9 - startTime
+	runningTime := float64(time_now().UnixNano())/1e9 - startTime
 	speed := int64(float64(fileSize) / runningTime)
 	LOG_INFO("BENCHMARK_WRITE", "Wrote %s bytes in %.2fs: %s/s", PrettySize(fileSize), runningTime, PrettySize(speed))
 
-	startTime = float64(time.Now().UnixNano()) / 1e9
+	startTime = float64(time_now().UnixNano()) / 1e9
 	LOG_INFO("BENCHMARK_READ", "Reading the random data from local disk")
 	file, err := os.Open(filename)
 	if err != nil {
@@ -139,7 +138,7 @@ func Benchmark(localDirectory string, storage Storage, fileSize int64, chunkSize
 		return false
 	}
 	file.Close()
-	runningTime = float64(time.Now().UnixNano())/1e9 - startTime
+	runningTime = float64(time_now().UnixNano())/1e9 - startTime
 	speed = int64(float64(fileSize) / runningTime)
 	LOG_INFO("BENCHMARK_READ", "Read %s bytes in %.2fs: %s/s", PrettySize(fileSize), runningTime, PrettySize(speed))
 
@@ -184,7 +183,7 @@ func Benchmark(localDirectory string, storage Storage, fileSize int64, chunkSize
 
 	}
 
-	startTime = float64(time.Now().UnixNano()) / 1e9
+	startTime = float64(time_now().UnixNano()) / 1e9
 	benchmarkRun(uploadThreads, chunkCount, func(threadIndex int, chunkIndex int) {
 		err := storage.UploadFile(threadIndex, fmt.Sprintf("benchmark/chunk%d", chunkIndex), chunks[chunkIndex])
 		if err != nil {
@@ -193,13 +192,13 @@ func Benchmark(localDirectory string, storage Storage, fileSize int64, chunkSize
 		}
 	})
 
-	runningTime = float64(time.Now().UnixNano())/1e9 - startTime
+	runningTime = float64(time_now().UnixNano())/1e9 - startTime
 	speed = int64(float64(chunkSize*chunkCount) / runningTime)
 	LOG_INFO("BENCHMARK_UPLOAD", "Uploaded %s bytes in %.2fs: %s/s", PrettySize(int64(chunkSize*chunkCount)), runningTime, PrettySize(speed))
 
 	config := CreateConfig()
 
-	startTime = float64(time.Now().UnixNano()) / 1e9
+	startTime = float64(time_now().UnixNano()) / 1e9
 	hashError := false
 	benchmarkRun(downloadThreads, chunkCount, func(threadIndex int, chunkIndex int) {
 		chunk := config.GetChunk()
@@ -220,7 +219,7 @@ func Benchmark(localDirectory string, storage Storage, fileSize int64, chunkSize
 		config.PutChunk(chunk)
 	})
 
-	runningTime = float64(time.Now().UnixNano())/1e9 - startTime
+	runningTime = float64(time_now().UnixNano())/1e9 - startTime
 	speed = int64(float64(chunkSize*chunkCount) / runningTime)
 	LOG_INFO("BENCHMARK_DOWNLOAD", "Downloaded %s bytes in %.2fs: %s/s", PrettySize(int64(chunkSize*chunkCount)), runningTime, PrettySize(speed))
 

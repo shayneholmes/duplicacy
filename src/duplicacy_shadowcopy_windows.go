@@ -38,7 +38,7 @@ var VSS_S_ASYNC_CANCELLED int32 = 0x0004230B
 
 func (async *IVSSAsync) Wait(seconds int) bool {
 
-	startTime := time.Now().Unix()
+	startTime := time_now().Unix()
 	for {
 		ret, _, _ := syscall.Syscall(async.VTable().wait, 2, uintptr(unsafe.Pointer(async)), uintptr(1000), 0)
 		if ret != 0 {
@@ -55,7 +55,7 @@ func (async *IVSSAsync) Wait(seconds int) bool {
 		if status == VSS_S_ASYNC_FINISHED {
 			return true
 		}
-		if time.Now().Unix()-startTime > int64(seconds) {
+		if time_now().Unix()-startTime > int64(seconds) {
 			LOG_WARN("IVSSASYNC_TIMEOUT", "IVssAsync is pending for more than %d seconds\n", seconds)
 			return false
 		}

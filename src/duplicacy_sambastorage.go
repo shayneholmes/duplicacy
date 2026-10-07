@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net"
 	"path"
-	"time"
 	"strings"
 	"syscall"
 	"math/rand"
@@ -53,7 +52,7 @@ func CreateSambaStorage(server string, port int, username string, password strin
 	}
 
 	// Random number fo generating the temporary chunk file suffix.
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time_now().UnixNano())
 
 	storage = &SambaStorage{
 		share:           share,

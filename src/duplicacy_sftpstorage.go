@@ -110,7 +110,7 @@ func CreateSFTPStorage(compatibilityMode bool, server string, port int, username
 	}
 
 	// Random number fo generating the temporary chunk file suffix.
-	rand.Seed(time.Now().UnixNano())
+	rand.Seed(time_now().UnixNano())
 
 	runtime.SetFinalizer(storage, CloseSFTPStorage)
 

@@ -29,7 +29,7 @@ func TestIsDeletable(t *testing.T) {
 
 	//SetLoggingLevel(DEBUG)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(3600 * 24)
 
 	allSnapshots := make(map[string][]*Snapshot)
@@ -255,7 +255,7 @@ func TestPruneSingleRepository(t *testing.T) {
 	chunkHash3 := uploadRandomChunk(snapshotManager, chunkSize)
 	chunkHash4 := uploadRandomChunk(snapshotManager, chunkSize)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 2 snapshots")
 	createTestSnapshot(snapshotManager, "repository1", 1, now-4*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
@@ -299,7 +299,7 @@ func TestPruneSingleHost(t *testing.T) {
 	chunkHash3 := uploadRandomChunk(snapshotManager, chunkSize)
 	chunkHash4 := uploadRandomChunk(snapshotManager, chunkSize)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 3 snapshots")
 	createTestSnapshot(snapshotManager, "vm1@host1", 1, now-3*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
@@ -340,7 +340,7 @@ func TestPruneMultipleHost(t *testing.T) {
 	chunkHash3 := uploadRandomChunk(snapshotManager, chunkSize)
 	chunkHash4 := uploadRandomChunk(snapshotManager, chunkSize)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 3 snapshot")
 	createTestSnapshot(snapshotManager, "vm1@host1", 1, now-3*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
@@ -388,7 +388,7 @@ func TestPruneAndResurrect(t *testing.T) {
 	chunkHash2 := uploadRandomChunk(snapshotManager, chunkSize)
 	chunkHash3 := uploadRandomChunk(snapshotManager, chunkSize)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 2 snapshots")
 	createTestSnapshot(snapshotManager, "vm1@host1", 1, now-3*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
@@ -423,7 +423,7 @@ func TestPruneWithInactiveHost(t *testing.T) {
 	chunkHash3 := uploadRandomChunk(snapshotManager, chunkSize)
 	chunkHash4 := uploadRandomChunk(snapshotManager, chunkSize)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 3 snapshot")
 	createTestSnapshot(snapshotManager, "vm1@host1", 1, now-3*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
@@ -464,7 +464,7 @@ func TestPruneWithRetentionPolicy(t *testing.T) {
 		chunkHashes = append(chunkHashes, uploadRandomChunk(snapshotManager, chunkSize))
 	}
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 30 snapshots")
 	for i := 0; i < 30; i++ {
@@ -500,7 +500,7 @@ func TestPruneWithRetentionPolicyAndTag(t *testing.T) {
 		chunkHashes = append(chunkHashes, uploadRandomChunk(snapshotManager, chunkSize))
 	}
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 30 snapshots")
 	for i := 0; i < 30; i++ {
@@ -533,7 +533,7 @@ func TestPruneWithFossils(t *testing.T) {
 	// Create an unreferenced fossil
 	snapshotManager.storage.UploadFile(0, "chunks/113b6a2350dcfd836829c47304dd330fa6b58b93dd7ac696c6b7b913e6868662.fsl", []byte("this is a test fossil"))
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 2 snapshots")
 	createTestSnapshot(snapshotManager, "vm1@host1", 1, now-3*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
@@ -566,7 +566,7 @@ func TestPruneMultipleThread(t *testing.T) {
 	chunkList1 := uploadRandomChunks(snapshotManager, chunkSize, numberOfChunks)
 	chunkList2 := uploadRandomChunks(snapshotManager, chunkSize, numberOfChunks)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 2 snapshots")
 	createTestSnapshot(snapshotManager, "repository1", 1, now-4*day-3600, now-3*day-60, chunkList1, "tag")
@@ -603,7 +603,7 @@ func TestPruneNewSnapshots(t *testing.T) {
 	chunkHash3 := uploadRandomChunk(snapshotManager, chunkSize)
 	chunkHash4 := uploadRandomChunk(snapshotManager, chunkSize)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 3 snapshots")
 	createTestSnapshot(snapshotManager, "vm1@host1", 1, now-3*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
@@ -643,7 +643,7 @@ func TestPruneGhostSnapshots(t *testing.T) {
 	chunkHash2 := uploadRandomChunk(snapshotManager, chunkSize)
 	chunkHash3 := uploadRandomChunk(snapshotManager, chunkSize)
 
-	now := time.Now().Unix()
+	now := time_now().Unix()
 	day := int64(24 * 3600)
 	t.Logf("Creating 2 snapshots")
 	createTestSnapshot(snapshotManager, "vm1@host1", 1, now-3*day-3600, now-3*day-60, []string{chunkHash1, chunkHash2}, "tag")
