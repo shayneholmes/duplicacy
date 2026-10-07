@@ -796,12 +796,7 @@ func backupRepository(context *cli.Context) {
 	backupManager.SetupSnapshotCache(preference.Name)
 	backupManager.SetDryRun(dryRun)
 
-	timestamp, err := time.Parse("2006-01-02 15:04", context.String("timestamp"))
-	if err != nil {
-		fmt.Fprintf(context.App.Writer, "The timestamp does not follow the correct format (2006-01-02 15:04)\n\n")
-		cli.ShowCommandHelp(context, context.Command.Name)
-		os.Exit(ArgumentExitCode)
-	}
+	timestamp := time.Unix(int64(context.Int("timestamp")), 0)
 
 	zstdLevel := context.String("zstd-level")
 	if zstdLevel != "" {
@@ -1533,10 +1528,10 @@ func main() {
 					Name:  "dry-run",
 					Usage: "dry run for testing, don't backup anything. Use with -stats and -d",
 				},
-				cli.StringFlag{
+				cli.IntFlag{
 					Name:     "timestamp",
 					Usage:    "override backup start time",
-					Argument: "<date>",
+					Argument: "<seconds>",
 				},
 				cli.StringFlag{
 					Name:     "zstd-level",
