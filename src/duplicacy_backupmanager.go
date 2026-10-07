@@ -19,6 +19,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
     "github.com/vmihailenco/msgpack"
 )
@@ -128,7 +129,7 @@ func (manager *BackupManager) SetupSnapshotCache(storageName string) bool {
 // unmodified files with last backup).  Otherwise (or if this is the first backup), the entire repository will
 // be scanned to create the snapshot.  'tag' is the tag assigned to the new snapshot.
 func (manager *BackupManager) Backup(top string, quickMode bool, threads int, tag string,
-	showStatistics bool, shadowCopy bool, shadowCopyTimeout int, enumOnly bool, metadataChunkSize int, maximumInMemoryEntries int) bool {
+	showStatistics bool, shadowCopy bool, shadowCopyTimeout int, enumOnly bool, metadataChunkSize int, maximumInMemoryEntries int, timestamp time.Time) bool {
 
 	var err error
 	top, err = filepath.Abs(top)
@@ -136,6 +137,8 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 		LOG_ERROR("REPOSITORY_ERR", "Failed to obtain the absolute path of the repository: %v", err)
 		return false
 	}
+
+	override_time(timestamp)
 
 	startTime := time_now().Unix()
 

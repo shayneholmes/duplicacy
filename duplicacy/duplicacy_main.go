@@ -17,6 +17,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"time"
 
 	_ "net/http/pprof"
 
@@ -795,6 +796,13 @@ func backupRepository(context *cli.Context) {
 	backupManager.SetupSnapshotCache(preference.Name)
 	backupManager.SetDryRun(dryRun)
 
+	timestamp, err := time.Parse("2006-01-02 15:04", context.String("timestamp"))
+	if err != nil {
+		fmt.Fprintf(context.App.Writer, "The timestamp does not follow the correct format (2006-01-02 15:04)\n\n")
+		cli.ShowCommandHelp(context, context.Command.Name)
+		os.Exit(ArgumentExitCode)
+	}
+
 	zstdLevel := context.String("zstd-level")
 	if zstdLevel != "" {
 		if level, found := duplicacy.ZSTD_COMPRESSION_LEVELS[zstdLevel]; found {
@@ -808,7 +816,7 @@ func backupRepository(context *cli.Context) {
 
 	metadataChunkSize := context.Int("metadata-chunk-size")
 	maximumInMemoryEntries := context.Int("max-in-memory-entries")
-	backupManager.Backup(repository, quickMode, threads, context.String("t"), showStatistics, enableVSS, vssTimeout, enumOnly, metadataChunkSize, maximumInMemoryEntries)
+	backupManager.Backup(repository, quickMode, threads, context.String("t"), showStatistics, enableVSS, vssTimeout, enumOnly, metadataChunkSize, maximumInMemoryEntries, timestamp)
 
 	runScript(context, preference.Name, "post")
 }
@@ -1524,6 +1532,11 @@ func main() {
 				cli.BoolFlag{
 					Name:  "dry-run",
 					Usage: "dry run for testing, don't backup anything. Use with -stats and -d",
+				},
+				cli.StringFlag{
+					Name:     "timestamp",
+					Usage:    "override backup start time",
+					Argument: "<date>",
 				},
 				cli.StringFlag{
 					Name:     "zstd-level",
