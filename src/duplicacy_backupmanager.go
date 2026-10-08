@@ -171,48 +171,9 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 
 	hashMode := remoteSnapshot.Revision == 0 || !quickMode
 
-	// This cache contains all chunks referenced by last snasphot. Any other chunks will lead to a call to
-	// UploadChunk.
-	chunkCache := make(map[string]bool)
-
-	// A revision number of 0 means this is the initial backup
-	if remoteSnapshot.Revision > 0 {
-		manager.SnapshotManager.DownloadSnapshotSequences(remoteSnapshot)
-		// Add all chunks in the last snapshot to the cache
-		for _, chunkID := range manager.SnapshotManager.GetSnapshotChunks(remoteSnapshot, true) {
-			chunkCache[chunkID] = true
-		}
-	}
-
 	var incompleteSnapshot *EntryList
 	if hashMode {
 		incompleteSnapshot = loadIncompleteSnapshot(manager.snapshotID, manager.cachePath)
-	}
-
-	// If the listing operation is fast and this is an initial backup, list all chunks and
-	// put them in the cache.
-	if (manager.storage.IsFastListing() && remoteSnapshot.Revision == 0) {
-		LOG_INFO("BACKUP_LIST", "Listing all chunks")
-		allChunks, _ := manager.SnapshotManager.ListAllFiles(manager.storage, "chunks/")
-
-		for _, chunk := range allChunks {
-			if len(chunk) == 0 || chunk[len(chunk)-1] == '/' {
-				continue
-			}
-
-			if strings.HasSuffix(chunk, ".fsl") {
-				continue
-			}
-
-			chunk = strings.Replace(chunk, "/", "", -1)
-			chunkCache[chunk] = true
-		}
-
-		// Make sure that all chunks in the incomplete snapshot must exist in the storage
-		if incompleteSnapshot != nil && !incompleteSnapshot.CheckChunks(manager.config, chunkCache) {
-			LOG_WARN("INCOMPLETE_DISCARD", "The incomplete snapshot can't be used as it contains chunks not in the storage")
-			incompleteSnapshot = nil
-		}
 	}
 
 	// Copy over chunks from the incomplete snapshot
@@ -396,6 +357,45 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 
 	startUploadingTime := time_now().Unix()
 	lastUploadingTime := time_now().Unix()
+
+	// This cache contains all chunks referenced by last snasphot. Any other chunks will lead to a call to
+	// UploadChunk.
+	chunkCache := make(map[string]bool)
+
+	// A revision number of 0 means this is the initial backup
+	if remoteSnapshot.Revision > 0 {
+		manager.SnapshotManager.DownloadSnapshotSequences(remoteSnapshot)
+		// Add all chunks in the last snapshot to the cache
+		for _, chunkID := range manager.SnapshotManager.GetSnapshotChunks(remoteSnapshot, true) {
+			chunkCache[chunkID] = true
+		}
+	}
+
+	// If the listing operation is fast and this is an initial backup, list all chunks and
+	// put them in the cache.
+	if (manager.storage.IsFastListing() && remoteSnapshot.Revision == 0) {
+		LOG_INFO("BACKUP_LIST", "Listing all chunks")
+		allChunks, _ := manager.SnapshotManager.ListAllFiles(manager.storage, "chunks/")
+
+		for _, chunk := range allChunks {
+			if len(chunk) == 0 || chunk[len(chunk)-1] == '/' {
+				continue
+			}
+
+			if strings.HasSuffix(chunk, ".fsl") {
+				continue
+			}
+
+			chunk = strings.Replace(chunk, "/", "", -1)
+			chunkCache[chunk] = true
+		}
+
+		// Make sure that all chunks in the incomplete snapshot must exist in the storage
+		if incompleteSnapshot != nil && !incompleteSnapshot.CheckChunks(manager.config, chunkCache) {
+			LOG_WARN("INCOMPLETE_DISCARD", "The incomplete snapshot can't be used as it contains chunks not in the storage")
+			incompleteSnapshot = nil
+		}
+	}
 
 	var numberOfNewFileChunks int64        // number of new file chunks
 	var totalUploadedFileChunkLength int64 // total length of uploaded file chunks
