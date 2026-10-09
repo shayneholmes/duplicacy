@@ -189,32 +189,6 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 		incompleteSnapshot = loadIncompleteSnapshot(manager.snapshotID, manager.cachePath)
 	}
 
-	// If the listing operation is fast and this is an initial backup, list all chunks and
-	// put them in the cache.
-	if (manager.storage.IsFastListing() && remoteSnapshot.Revision == 0) {
-		LOG_INFO("BACKUP_LIST", "Listing all chunks")
-		allChunks, _ := manager.SnapshotManager.ListAllFiles(manager.storage, "chunks/")
-
-		for _, chunk := range allChunks {
-			if len(chunk) == 0 || chunk[len(chunk)-1] == '/' {
-				continue
-			}
-
-			if strings.HasSuffix(chunk, ".fsl") {
-				continue
-			}
-
-			chunk = strings.Replace(chunk, "/", "", -1)
-			chunkCache[chunk] = true
-		}
-
-		// Make sure that all chunks in the incomplete snapshot must exist in the storage
-		if incompleteSnapshot != nil && !incompleteSnapshot.CheckChunks(manager.config, chunkCache) {
-			LOG_WARN("INCOMPLETE_DISCARD", "The incomplete snapshot can't be used as it contains chunks not in the storage")
-			incompleteSnapshot = nil
-		}
-	}
-
 	// Copy over chunks from the incomplete snapshot
 	if incompleteSnapshot != nil {
 		remoteSnapshot.ChunkHashes = append(incompleteSnapshot.PreservedChunkHashes, incompleteSnapshot.UploadedChunkHashes...)
@@ -396,6 +370,32 @@ func (manager *BackupManager) Backup(top string, quickMode bool, threads int, ta
 
 	startUploadingTime := time_now().Unix()
 	lastUploadingTime := time_now().Unix()
+
+	// If the listing operation is fast and this is an initial backup, list all chunks and
+	// put them in the cache.
+	if (manager.storage.IsFastListing() && remoteSnapshot.Revision == 0) {
+		LOG_INFO("BACKUP_LIST", "Listing all chunks")
+		allChunks, _ := manager.SnapshotManager.ListAllFiles(manager.storage, "chunks/")
+
+		for _, chunk := range allChunks {
+			if len(chunk) == 0 || chunk[len(chunk)-1] == '/' {
+				continue
+			}
+
+			if strings.HasSuffix(chunk, ".fsl") {
+				continue
+			}
+
+			chunk = strings.Replace(chunk, "/", "", -1)
+			chunkCache[chunk] = true
+		}
+
+		// Make sure that all chunks in the incomplete snapshot must exist in the storage
+		if incompleteSnapshot != nil && !incompleteSnapshot.CheckChunks(manager.config, chunkCache) {
+			LOG_WARN("INCOMPLETE_DISCARD", "The incomplete snapshot can't be used as it contains chunks not in the storage")
+			incompleteSnapshot = nil
+		}
+	}
 
 	var numberOfNewFileChunks int64        // number of new file chunks
 	var totalUploadedFileChunkLength int64 // total length of uploaded file chunks
