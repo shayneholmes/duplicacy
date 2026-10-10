@@ -355,7 +355,7 @@ func (storage *SFTPStorage) IsFastListing() bool {
 			return false
 		}
 	}
-	return true
+	return false
 }
 
 // Enable the test mode.
